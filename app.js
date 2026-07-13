@@ -61,6 +61,9 @@ function personName(a) {
 let appData = { meta: {}, kategorien: [], abwesenheiten: [] };
 let currentUser = null;
 let editingId = null;
+// Mitglieder der Bearbeiter-Gruppen für den "Vertreter"-Picker im Formular --
+// [{username,displayName}] | null solange nicht geladen, siehe ensureEditorsLoaded.
+let editorUsers = null;
 
 // ---------- Normalisierung & Lookups ----------
 function normalizeData(data) {
@@ -81,6 +84,8 @@ function normalizeAbwesenheit(a) {
     von: ISO_RE.test(d.von || "") ? d.von : "",
     bis: ISO_RE.test(d.bis || "") ? d.bis : "",
     kategorie: typeof d.kategorie === "string" ? d.kategorie : "",
+    vertreterUsername: typeof d.vertreterUsername === "string" ? d.vertreterUsername : "",
+    vertreterName: typeof d.vertreterName === "string" ? d.vertreterName : "",
     notiz: typeof d.notiz === "string" ? d.notiz : "",
     erstelltAm: typeof d.erstelltAm === "string" ? d.erstelltAm : ""
   };
@@ -103,6 +108,38 @@ function canEdit() {
 function myUsername() { return currentUser ? currentUser.username : ""; }
 function canManageEintrag(a) {
   return canEdit() || !!(a.erstelltVon && a.erstelltVon === myUsername());
+}
+
+// Lädt einmalig die Mitglieder der Bearbeiter-Gruppen dieser App (für den
+// "Vertreter"-Picker) -- Fehler werden geschluckt (leere Liste), damit ein
+// nicht ladbares Verzeichnis nicht das ganze Formular blockiert.
+async function ensureEditorsLoaded() {
+  if (editorUsers) return;
+  try {
+    const res = await fetchToolEditors();
+    editorUsers = Array.isArray(res.users) ? res.users : [];
+  } catch (e) {
+    console.warn("Vertreter-Liste konnte nicht geladen werden", e);
+    editorUsers = [];
+  }
+}
+
+// Vertreter-Auswahlliste ohne die eigene Person (sich selbst vertreten ergibt
+// keinen Sinn) -- inkl. Platzhalter-Option, da das Feld optional ist. War die
+// bisher gewählte Person zwischenzeitlich aus den Bearbeiter-Gruppen entfernt
+// worden, bleibt sie trotzdem als Option erhalten, damit ein unbeteiligtes
+// Speichern (z.B. nur die Notiz ändern) die bestehende Zuordnung nicht
+// stillschweigend löscht.
+function fillVertreterSelect(selectedUsername, selectedName) {
+  const el = document.getElementById("tf-vertreter");
+  const options = (editorUsers || []).filter((u) => u.username !== myUsername());
+  let html = `<option value="">— keiner ausgewählt —</option>`;
+  if (selectedUsername && !options.some((u) => u.username === selectedUsername)) {
+    html += `<option value="${escapeHtml(selectedUsername)}">${escapeHtml(selectedName || selectedUsername)}</option>`;
+  }
+  html += options.map((u) => `<option value="${escapeHtml(u.username)}">${escapeHtml(u.displayName)}</option>`).join("");
+  el.innerHTML = html;
+  el.value = selectedUsername || "";
 }
 
 function renderHeaderUser() {
@@ -130,6 +167,7 @@ function abwesenheitCardHtml(a, isHero) {
   const dayBadge = `<span class="tc-day">${dt.getDate()}</span><span class="tc-mon">${MONATE_KURZ[dt.getMonth()]}</span>` +
     (end !== start ? `<span class="tc-range">bis ${fmtDate(end)}</span>` : "");
   const farbe = katFarbe(a.kategorie);
+  const vertretung = a.vertreterUsername ? `<div class="tc-sub">🔁 Vertretung: ${escapeHtml(a.vertreterName || a.vertreterUsername)}</div>` : "";
   const notiz = a.notiz ? `<div class="tc-notiz">${escapeHtml(a.notiz)}</div>` : "";
   const eigen = a.erstelltVon === myUsername() ? `<span class="tc-badge tc-badge-own">Eigener Eintrag</span>` : "";
   const mine = canManageEintrag(a);
@@ -145,6 +183,7 @@ function abwesenheitCardHtml(a, isHero) {
           </div>
           <div class="tc-title">${escapeHtml(personName(a))}</div>
           <div class="tc-sub tc-datespan">📅 ${escapeHtml(wochentagLabel(start))}, ${escapeHtml(abwesenheitDatumLabel(a))}</div>
+          ${vertretung}
           ${notiz}
         </div>
       </div>
@@ -227,15 +266,17 @@ function fillSelect(el, options) {
 
 // ---------- Abwesenheits-Formular ----------
 function setFormDisabled(disabled) {
-  ["tf-von", "tf-bis", "tf-kategorie", "tf-notiz"].forEach((id) => { document.getElementById(id).disabled = disabled; });
+  ["tf-von", "tf-bis", "tf-kategorie", "tf-vertreter", "tf-notiz"].forEach((id) => { document.getElementById(id).disabled = disabled; });
 }
 
-function openTerminModal(idOrNew) {
+async function openTerminModal(idOrNew) {
   const a = (typeof idOrNew === "string") ? appData.abwesenheiten.find((x) => x.id === idOrNew) : null;
-  if (a && !canManageEintrag(a)) { openTerminModalReadOnly(a); return; }
+  if (a && !canManageEintrag(a)) { await openTerminModalReadOnly(a); return; }
 
   editingId = a ? a.id : null;
   fillSelect(document.getElementById("tf-kategorie"), appData.kategorien.map((k) => ({ value: k.id, label: k.name })));
+  await ensureEditorsLoaded();
+  fillVertreterSelect(a ? a.vertreterUsername : "", a ? a.vertreterName : "");
 
   document.getElementById("tf-von").value = a ? (a.von || "") : todayIso();
   document.getElementById("tf-bis").value = a ? (a.bis || "") : todayIso();
@@ -261,9 +302,11 @@ function openTerminModal(idOrNew) {
 // Fremder Eintrag (nicht eigene, kein Bearbeiter-Recht): read-only anzeigen --
 // volle Transparenz (jede:r sieht alle Abwesenheiten), aber keine
 // Bearbeitungsmöglichkeit. Speichern/Löschen-Buttons bleiben versteckt.
-function openTerminModalReadOnly(a) {
+async function openTerminModalReadOnly(a) {
   editingId = a.id;
   fillSelect(document.getElementById("tf-kategorie"), appData.kategorien.map((k) => ({ value: k.id, label: k.name })));
+  await ensureEditorsLoaded();
+  fillVertreterSelect(a.vertreterUsername, a.vertreterName);
   document.getElementById("tf-von").value = a.von || "";
   document.getElementById("tf-bis").value = a.bis || "";
   document.getElementById("tf-kategorie").value = a.kategorie;
@@ -290,12 +333,22 @@ async function saveTermin() {
   const von = document.getElementById("tf-von").value;
   const bis = document.getElementById("tf-bis").value;
   const kategorie = document.getElementById("tf-kategorie").value;
+  const vertreterUsername = document.getElementById("tf-vertreter").value;
   const notiz = document.getElementById("tf-notiz").value.trim();
 
   if (!ISO_RE.test(von)) { alert("Bitte ein gültiges Von-Datum wählen."); return; }
   if (!ISO_RE.test(bis)) { alert("Bitte ein gültiges Bis-Datum wählen."); return; }
   if (bis < von) { alert("Das Bis-Datum darf nicht vor dem Von-Datum liegen."); return; }
   if (!kategorie) { alert("Bitte eine Art auswählen."); return; }
+
+  // Anzeigename des gewählten Vertreters für die Karten-Anzeige einfangen (siehe
+  // fillVertreterSelect -- die Option kann auch aus der "bereits gewählt, aber
+  // nicht mehr Bearbeiter"-Sonderoption stammen, deshalb aus dem DOM lesen statt
+  // erneut in editorUsers nachzuschlagen).
+  const vertreterSelectEl = document.getElementById("tf-vertreter");
+  const vertreterName = vertreterUsername
+    ? (vertreterSelectEl.options[vertreterSelectEl.selectedIndex].textContent || vertreterUsername)
+    : "";
 
   const btn = document.getElementById("btn-save-termin");
   btn.disabled = true;
@@ -316,6 +369,8 @@ async function saveTermin() {
     a.von = von;
     a.bis = bis;
     a.kategorie = kategorie;
+    a.vertreterUsername = vertreterUsername || undefined;
+    a.vertreterName = vertreterUsername ? vertreterName : undefined;
     a.notiz = notiz || undefined;
     if (isNew) a.erstelltAm = new Date().toISOString();
 
@@ -487,6 +542,9 @@ async function startApp() {
   renderHeaderUser();
   applyAdminVisibility();
   renderVersionInfo();
+  // Vorab laden, damit das Formular beim ersten Öffnen nicht auf die
+  // Vertreter-Liste warten muss (ensureEditorsLoaded ist ohnehin idempotent).
+  await ensureEditorsLoaded();
   await purgePastEvents();
   renderAll();
 }

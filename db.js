@@ -68,3 +68,9 @@ async function gatewaySave(dataObj) {
 async function fetchMe() {
   return gatewayRequest({ action: "me", app: GATEWAY_APP_ID });
 }
+
+// Liefert {users:[{username,displayName}]} aller Mitglieder der Bearbeiter-
+// Gruppen dieser App -- für den "Vertreter"-Picker im Formular.
+async function fetchToolEditors() {
+  return gatewayRequest({ action: "list-tool-editors", app: GATEWAY_APP_ID });
+}

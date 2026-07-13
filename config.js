@@ -12,6 +12,17 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.1",
+    groups: [
+      {
+        title: "Vertreter",
+        items: [
+          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.0",
     groups: [
       {
