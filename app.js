@@ -124,22 +124,72 @@ async function ensureEditorsLoaded() {
   }
 }
 
-// Vertreter-Auswahlliste ohne die eigene Person (sich selbst vertreten ergibt
-// keinen Sinn) -- inkl. Platzhalter-Option, da das Feld optional ist. War die
-// bisher gewählte Person zwischenzeitlich aus den Bearbeiter-Gruppen entfernt
-// worden, bleibt sie trotzdem als Option erhalten, damit ein unbeteiligtes
-// Speichern (z.B. nur die Notiz ändern) die bestehende Zuordnung nicht
-// stillschweigend löscht.
+// Eigentümer des Formulars: bei einer bestehenden Abwesenheit deren erstelltVon
+// (bleibt beim Bearbeiten durch einen Bearbeiter unverändert -- niemand kann
+// eine Abwesenheit "im Namen von" jemand anderem anlegen, siehe CLAUDE.md),
+// bei einer neuen Abwesenheit der aktuell eingeloggte Nutzer.
+function formOwnerUsername() {
+  if (!editingId) return myUsername();
+  const a = appData.abwesenheiten.find((x) => x.id === editingId);
+  return a ? a.erstelltVon : myUsername();
+}
+
+// Prüft, ob eine Person im angegebenen Zeitraum bereits selbst abwesend ist
+// (beliebige Art) -- verhindert, dass jemand als Vertreter ausgewählt werden
+// kann, der im selben Zeitraum z.B. ebenfalls Urlaub hat. excludeId blendet
+// die gerade bearbeitete Abwesenheit selbst aus dem Abgleich aus.
+function personHasOverlap(username, von, bis, excludeId) {
+  if (!ISO_RE.test(von) || !ISO_RE.test(bis)) return false;
+  return appData.abwesenheiten.some((a) =>
+    a.id !== excludeId && a.erstelltVon === username &&
+    ISO_RE.test(a.von) && ISO_RE.test(a.bis) && a.von <= bis && von <= a.bis
+  );
+}
+
+// Vertreter-Auswahlliste: ohne den Formular-Eigentümer (sich selbst vertreten
+// ergibt keinen Sinn) und ohne Personen, die im aktuell im Formular stehenden
+// Zeitraum selbst schon abwesend sind (personHasOverlap). Inkl. Platzhalter-
+// Option, da das Feld optional ist. Eine bisher gewählte Person, die
+// zwischenzeitlich aus den Bearbeiter-Gruppen entfernt wurde, bleibt als
+// Zusatzoption erhalten (damit ein unbeteiligtes Speichern z.B. nur der Notiz
+// die bestehende Zuordnung nicht stillschweigend löscht) -- ABER nur, wenn sie
+// nicht zusätzlich auch noch überschneidend abwesend ist; ein echter
+// Terminkonflikt setzt die Auswahl dagegen zurück auf "keiner ausgewählt".
 function fillVertreterSelect(selectedUsername, selectedName) {
   const el = document.getElementById("tf-vertreter");
-  const options = (editorUsers || []).filter((u) => u.username !== myUsername());
+  const von = document.getElementById("tf-von").value;
+  const bis = document.getElementById("tf-bis").value;
+  const owner = formOwnerUsername();
+  const isEditorMember = (u) => (editorUsers || []).some((x) => x.username === u);
+  const available = (editorUsers || [])
+    .filter((u) => u.username !== owner)
+    .filter((u) => !personHasOverlap(u.username, von, bis, editingId));
+
   let html = `<option value="">— keiner ausgewählt —</option>`;
-  if (selectedUsername && !options.some((u) => u.username === selectedUsername)) {
-    html += `<option value="${escapeHtml(selectedUsername)}">${escapeHtml(selectedName || selectedUsername)}</option>`;
+  let finalValue = "";
+  if (selectedUsername) {
+    if (available.some((u) => u.username === selectedUsername)) {
+      finalValue = selectedUsername;
+    } else if (!isEditorMember(selectedUsername) && !personHasOverlap(selectedUsername, von, bis, editingId)) {
+      html += `<option value="${escapeHtml(selectedUsername)}">${escapeHtml(selectedName || selectedUsername)}</option>`;
+      finalValue = selectedUsername;
+    }
+    // sonst: echter Konflikt (überschneidend abwesend) -- Auswahl wird zurückgesetzt.
   }
-  html += options.map((u) => `<option value="${escapeHtml(u.username)}">${escapeHtml(u.displayName)}</option>`).join("");
+  html += available.map((u) => `<option value="${escapeHtml(u.username)}">${escapeHtml(u.displayName)}</option>`).join("");
   el.innerHTML = html;
-  el.value = selectedUsername || "";
+  el.value = finalValue;
+}
+
+// Live-Neuberechnung, wenn Von/Bis im offenen Formular geändert werden --
+// bereits gewählte Person bleibt erhalten, sofern sie im neuen Zeitraum nicht
+// überschneidend abwesend ist (siehe fillVertreterSelect).
+function onVertreterRelevantFieldChange() {
+  const sel = document.getElementById("tf-vertreter");
+  if (sel.disabled) return; // read-only Ansicht: keine Neuberechnung nötig
+  const currentValue = sel.value;
+  const currentText = (currentValue && sel.selectedIndex >= 0) ? sel.options[sel.selectedIndex].textContent : "";
+  fillVertreterSelect(currentValue, currentText);
 }
 
 function renderHeaderUser() {
@@ -275,14 +325,17 @@ async function openTerminModal(idOrNew) {
 
   editingId = a ? a.id : null;
   fillSelect(document.getElementById("tf-kategorie"), appData.kategorien.map((k) => ({ value: k.id, label: k.name })));
-  await ensureEditorsLoaded();
-  fillVertreterSelect(a ? a.vertreterUsername : "", a ? a.vertreterName : "");
 
   document.getElementById("tf-von").value = a ? (a.von || "") : todayIso();
   document.getElementById("tf-bis").value = a ? (a.bis || "") : todayIso();
   document.getElementById("tf-kategorie").value = a ? a.kategorie : (appData.kategorien[0] ? appData.kategorien[0].id : "sonstiges");
   document.getElementById("tf-notiz").value = a ? (a.notiz || "") : "";
   setFormDisabled(false);
+
+  // Erst NACH dem Setzen von Von/Bis füllen -- fillVertreterSelect liest den
+  // aktuellen Zeitraum aus dem Formular, um überschneidend Abwesende auszuschließen.
+  await ensureEditorsLoaded();
+  fillVertreterSelect(a ? a.vertreterUsername : "", a ? a.vertreterName : "");
 
   const personLabel = document.getElementById("tf-person-label");
   if (a && a.erstelltVon !== myUsername()) {
@@ -305,13 +358,13 @@ async function openTerminModal(idOrNew) {
 async function openTerminModalReadOnly(a) {
   editingId = a.id;
   fillSelect(document.getElementById("tf-kategorie"), appData.kategorien.map((k) => ({ value: k.id, label: k.name })));
-  await ensureEditorsLoaded();
-  fillVertreterSelect(a.vertreterUsername, a.vertreterName);
   document.getElementById("tf-von").value = a.von || "";
   document.getElementById("tf-bis").value = a.bis || "";
   document.getElementById("tf-kategorie").value = a.kategorie;
   document.getElementById("tf-notiz").value = a.notiz || "";
   setFormDisabled(true);
+  await ensureEditorsLoaded();
+  fillVertreterSelect(a.vertreterUsername, a.vertreterName);
 
   const personLabel = document.getElementById("tf-person-label");
   personLabel.textContent = "Person: " + personName(a);
@@ -580,6 +633,12 @@ function setupListeners() {
   // ansehen (fremde), siehe openTerminModal.
   document.getElementById("hero").addEventListener("click", onCardClick);
   document.getElementById("termin-list").addEventListener("click", onCardClick);
+
+  // Vertreter-Liste live neu berechnen, sobald sich der Zeitraum ändert (siehe
+  // fillVertreterSelect/onVertreterRelevantFieldChange) -- schließt Personen aus,
+  // die im neuen Zeitraum selbst schon abwesend sind.
+  document.getElementById("tf-von").addEventListener("change", onVertreterRelevantFieldChange);
+  document.getElementById("tf-bis").addEventListener("change", onVertreterRelevantFieldChange);
 
   document.getElementById("termin-modal-close").addEventListener("click", closeTerminModal);
   document.getElementById("btn-cancel-termin").addEventListener("click", closeTerminModal);

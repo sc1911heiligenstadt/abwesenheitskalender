@@ -17,7 +17,8 @@ const APP_CHANGELOG = [
       {
         title: "Vertreter",
         items: [
-          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional."
+          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional.",
+          "Personen, die im gewählten Zeitraum selbst schon abwesend sind, stehen nicht zur Auswahl."
         ]
       }
     ]
