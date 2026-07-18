@@ -12,18 +12,6 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
-    version: "1.1",
-    groups: [
-      {
-        title: "Vertreter",
-        items: [
-          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional.",
-          "Personen, die im gewählten Zeitraum selbst schon abwesend sind, stehen nicht zur Auswahl."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
@@ -33,6 +21,13 @@ const APP_CHANGELOG = [
           "Alle mit Tool-Zugriff sehen die komplette Übersicht (wer wann abwesend ist) — jede:r verwaltet aber nur die eigenen Einträge, Bearbeiter-Gruppen verwalten alle.",
           "Vergangene Einträge werden beim Öffnen durch einen Bearbeiter automatisch aufgeräumt.",
           "Abwesenheitsarten im Einstellungen-Tab frei verwaltbar (nur Bearbeiter)."
+        ]
+      },
+      {
+        title: "Vertreter",
+        items: [
+          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional.",
+          "Personen, die im gewählten Zeitraum selbst schon abwesend sind, stehen nicht zur Auswahl."
         ]
       }
     ]
