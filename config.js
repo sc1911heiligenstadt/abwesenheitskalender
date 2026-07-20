@@ -12,18 +12,6 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
-    version: "1.1",
-    groups: [
-      {
-        title: "Speichern",
-        items: [
-          "Behoben: Beim zügigen Bearbeiten — etwa mehrere Abwesenheiten kurz nacheinander speichern oder löschen, oder Name und Farbe einer Abwesenheitsart im Einstellungen-Tab ändern — erschien wiederholt die Meldung „Die Daten wurden zwischenzeitlich auf einem anderen Gerät geändert“, obwohl niemand sonst am Kalender arbeitete; die zuletzt gemachte Eingabe ging dabei verloren. Es wird jetzt immer nur ein Speichervorgang gleichzeitig ausgeführt, weitere Änderungen werden direkt danach mitgespeichert.",
-          "Die Meldung erscheint dadurch nur noch, wenn tatsächlich ein anderes Gerät den Kalender geändert hat."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
