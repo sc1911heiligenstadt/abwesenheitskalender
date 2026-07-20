@@ -555,7 +555,44 @@ function setSaveStatus(text, kind) {
 // mitgeschicktes rev wird von handleOwnerFilteredSave ignoriert) -- nach Erfolg
 // wird der echte gemergte Stand (inkl. aller fremden Einträge) neu geladen,
 // damit appData wieder synchron ist.
-async function persistAbwesenheiten() {
+//
+// Es darf dabei immer nur EIN Schreibvorgang unterwegs sein — und zwar für BEIDE
+// Pfade gemeinsam: gatewayRev (das ETag, mit dem der Worker Konflikte erkennt)
+// wird erst aktualisiert, wenn ein Save zurückkommt, ein zweiter Save, der
+// währenddessen startet, schickt also dasselbe, inzwischen veraltete ETag und
+// wird zwangsläufig mit 409 abgelehnt. Für die bearbeitende Person sah das aus
+// wie "ein anderes Gerät hat geändert", obwohl sie allein war, und
+// reloadAfterConflict() verwarf dabei ihre letzte Eingabe. Beim Selbstbedienungs-
+// Pfad gibt es zwar kein rev, dafür würde ein zweiter Save gegen das nach dem
+// ersten frisch geladene appData laufen bzw. das Neuladen mitten in den nächsten
+// Save fallen — auch das darf sich nicht überholen. Deshalb laufen beide Pfade
+// durch dieselbe Schleife: persistAbwesenheiten() merkt nur vor,
+// writeToGateway() entscheidet pro Durchlauf neu, welcher Pfad greift, und
+// Änderungen, die während eines laufenden Saves anfallen, werden danach in einem
+// Rutsch nachgeschrieben. Fehler werden weiterhin an die Aufrufer geworfen — die
+// ConflictError-/NotLoggedInError-Behandlung liegt dort und bleibt unverändert.
+let saveRunner = null;
+let saveDirty = false;
+function persistAbwesenheiten() {
+  saveDirty = true;
+  if (!saveRunner) saveRunner = runSaveLoop().finally(() => { saveRunner = null; });
+  return saveRunner;
+}
+async function runSaveLoop() {
+  while (saveDirty) {
+    saveDirty = false;
+    try {
+      await writeToGateway();
+    } catch (e) {
+      // Bei Konflikt/Fehler lädt der Aufrufer den Stand neu bzw. zeigt den
+      // Login-Screen — dann NICHT blind nachschreiben, das würde den fremden
+      // Stand wieder überbügeln.
+      saveDirty = false;
+      throw e;
+    }
+  }
+}
+async function writeToGateway() {
   if (canEdit()) {
     appData.meta = Object.assign({}, appData.meta, { stand: new Date().toISOString() });
     await gatewaySave(appData);
