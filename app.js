@@ -573,8 +573,12 @@ function setSaveStatus(text, kind) {
 // ConflictError-/NotLoggedInError-Behandlung liegt dort und bleibt unverändert.
 let saveRunner = null;
 let saveDirty = false;
+// Für das Sicherheitsnetz beim Verlassen der Seite (beforeunload unten).
+let ungespeicherteAenderungen = false;
+let letzterSaveFehlgeschlagen = false;
 function persistAbwesenheiten() {
   saveDirty = true;
+  ungespeicherteAenderungen = true;
   if (!saveRunner) saveRunner = runSaveLoop().finally(() => { saveRunner = null; });
   return saveRunner;
 }
@@ -588,10 +592,30 @@ async function runSaveLoop() {
       // Login-Screen — dann NICHT blind nachschreiben, das würde den fremden
       // Stand wieder überbügeln.
       saveDirty = false;
+      letzterSaveFehlgeschlagen = true;
       throw e;
     }
   }
+  ungespeicherteAenderungen = false;
+  letzterSaveFehlgeschlagen = false;
 }
+
+// Sicherheitsnetz beim Verlassen der Seite: ein laufender fetch wird beim
+// Entladen abgebrochen, der keepalive-Request überlebt das Schließen des Tabs.
+// Die Nutzlast muss dieselbe Weiche nehmen wie writeToGateway() — ein
+// Nicht-Bearbeiter darf nur die eigenen Einträge schicken, sonst antwortet der
+// Worker mit 400 "fremde oder ungültige Einträge" und der Rettungsversuch wäre
+// wirkungslos. Nachgefragt wird nur, wenn der Beacon nicht trägt.
+window.addEventListener("beforeunload", (e) => {
+  if (!ungespeicherteAenderungen) return;
+  const nutzlast = canEdit()
+    ? appData
+    : { abwesenheiten: appData.abwesenheiten.filter((a) => a.erstelltVon === myUsername()) };
+  const abgeschickt = gatewaySaveBeacon(nutzlast);
+  if (abgeschickt && !letzterSaveFehlgeschlagen) return;
+  e.preventDefault();
+  e.returnValue = "";
+});
 async function writeToGateway() {
   if (canEdit()) {
     appData.meta = Object.assign({}, appData.meta, { stand: new Date().toISOString() });
