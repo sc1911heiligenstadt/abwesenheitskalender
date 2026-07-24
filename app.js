@@ -105,6 +105,12 @@ function canEdit() {
   if (!currentUser) return false;
   return currentUser.isAdmin || !!currentUser.canEdit;
 }
+// Administrieren-Ebene: Kategorien-Verwaltung (Einstellungen-Tab) ist Administratoren
+// vorbehalten; Abwesenheiten selbst pflegen bleibt Bearbeiten-Sache (2026-07-24).
+function canAdmin() {
+  if (!currentUser) return false;
+  return currentUser.isAdmin || !!currentUser.canAdmin;
+}
 function myUsername() { return currentUser ? currentUser.username : ""; }
 function canManageEintrag() {
   // Seit 2026-07-24 (2. Runde, Michel): Sehen = absolut nichts editierbar. Früher durfte
@@ -209,8 +215,11 @@ function renderHeaderUser() {
 
 function applyAdminVisibility() {
   const editable = canEdit();
+  const admin = canAdmin();
   document.body.classList.toggle("can-edit", editable);
   document.querySelectorAll(".editor-only").forEach((el) => el.classList.toggle("hidden", !editable));
+  // .admin-only (Einstellungen-Tab = Kategorien-Verwaltung) nur mit Administrieren-Recht.
+  document.querySelectorAll(".admin-only").forEach((el) => el.classList.toggle("hidden", !admin));
 }
 
 // ---------- Render: Abwesenheiten ----------

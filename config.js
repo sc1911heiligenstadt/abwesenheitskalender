@@ -20,7 +20,7 @@ const APP_CHANGELOG = [
           "Eigene Abwesenheiten (Urlaub, Krankheit, Fortbildung/Lehrgang, Sonstiges) mit Zeitraum von–bis eintragen.",
           "Alle mit Tool-Zugriff sehen die komplette Übersicht (wer wann abwesend ist); Abwesenheiten anlegen/ändern/löschen setzt seit 2026-07-24 Bearbeiten-Recht voraus — Nur-Seher sehen die Übersicht komplett, aber schreibgeschützt (der „+ Neue Abwesenheit“-Button ist für sie ausgeblendet, auch serverseitig gesperrt).",
           "Vergangene Einträge werden beim Öffnen durch einen Bearbeiter automatisch aufgeräumt.",
-          "Abwesenheitsarten im Einstellungen-Tab frei verwaltbar (nur Bearbeiter)."
+          "Abwesenheitsarten im Einstellungen-Tab frei verwaltbar — der Einstellungen-Tab ist seit 2026-07-24 Administratoren vorbehalten (das Pflegen der eigenen bzw. aller Abwesenheiten bleibt Bearbeiter-Sache, der Info-Tab bleibt für alle sichtbar)."
         ]
       },
       {
