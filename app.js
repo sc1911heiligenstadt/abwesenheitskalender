@@ -106,8 +106,11 @@ function canEdit() {
   return currentUser.isAdmin || !!currentUser.canEdit;
 }
 function myUsername() { return currentUser ? currentUser.username : ""; }
-function canManageEintrag(a) {
-  return canEdit() || !!(a.erstelltVon && a.erstelltVon === myUsername());
+function canManageEintrag() {
+  // Seit 2026-07-24 (2. Runde, Michel): Sehen = absolut nichts editierbar. Früher durfte
+  // jeder seine EIGENEN Einträge anlegen/ändern/löschen (canEdit() || eigener) -- jetzt
+  // nur noch Bearbeiter. Serverseitig zusätzlich via WRITE_REQUIRES_EDIT_PERMISSION.
+  return canEdit();
 }
 
 // Lädt einmalig die Mitglieder der Bearbeiter-Gruppen dieser App (für den

@@ -18,7 +18,7 @@ const APP_CHANGELOG = [
         title: "Abwesenheitskalender",
         items: [
           "Eigene Abwesenheiten (Urlaub, Krankheit, Fortbildung/Lehrgang, Sonstiges) mit Zeitraum von–bis eintragen.",
-          "Alle mit Tool-Zugriff sehen die komplette Übersicht (wer wann abwesend ist) — jede:r verwaltet aber nur die eigenen Einträge, Bearbeiter-Gruppen verwalten alle.",
+          "Alle mit Tool-Zugriff sehen die komplette Übersicht (wer wann abwesend ist); Abwesenheiten anlegen/ändern/löschen setzt seit 2026-07-24 Bearbeiten-Recht voraus — Nur-Seher sehen die Übersicht komplett, aber schreibgeschützt (der „+ Neue Abwesenheit“-Button ist für sie ausgeblendet, auch serverseitig gesperrt).",
           "Vergangene Einträge werden beim Öffnen durch einen Bearbeiter automatisch aufgeräumt.",
           "Abwesenheitsarten im Einstellungen-Tab frei verwaltbar (nur Bearbeiter)."
         ]
