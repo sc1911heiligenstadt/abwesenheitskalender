@@ -12,33 +12,45 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
-    version: "1.1",
-    groups: [
-      {
-        title: "Bedienung am Handy",
-        items: [
-          "Eingabefelder sind am Handy mindestens 16 Pixel groß. Dadurch zoomt der iPhone-Browser beim Antippen eines Feldes nicht mehr ungefragt in die Seite hinein und bleibt danach verschoben stehen."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
         title: "Abwesenheitskalender",
         items: [
-          "Eigene Abwesenheiten (Urlaub, Krankheit, Fortbildung/Lehrgang, Sonstiges) mit Zeitraum von–bis eintragen.",
-          "Alle mit Tool-Zugriff sehen die komplette Übersicht (wer wann abwesend ist); Abwesenheiten anlegen/ändern/löschen setzt seit 2026-07-24 Bearbeiten-Recht voraus — Nur-Seher sehen die Übersicht komplett, aber schreibgeschützt (der „+ Neue Abwesenheit“-Button ist für sie ausgeblendet, auch serverseitig gesperrt).",
-          "Vergangene Einträge werden beim Öffnen durch einen Bearbeiter automatisch aufgeräumt.",
-          "Abwesenheitsarten im Einstellungen-Tab frei verwaltbar — der Einstellungen-Tab ist seit 2026-07-24 Administratoren vorbehalten (das Pflegen der eigenen bzw. aller Abwesenheiten bleibt Bearbeiter-Sache, der Info-Tab bleibt für alle sichtbar)."
+          "Eigene Abwesenheiten mit Zeitraum von–bis eintragen: Urlaub, Krankheit, Fortbildung/Lehrgang oder Sonstiges.",
+          "Alle mit Zugriff auf das Werkzeug sehen die vollständige Übersicht, wer wann abwesend ist.",
+          "Vergangene Einträge räumt die App beim Öffnen von selbst auf, sobald ein Bearbeiter die Seite aufruft."
         ]
       },
       {
         title: "Vertreter",
         items: [
-          "Neues Feld „Vertreter“ beim Anlegen/Bearbeiten einer Abwesenheit — Auswahl aus den Mitgliedern der Bearbeiter-Gruppen, optional.",
-          "Personen, die im gewählten Zeitraum selbst schon abwesend sind, stehen nicht zur Auswahl."
+          "Zu jeder Abwesenheit lässt sich ein Vertreter angeben — freiwillig, das Feld darf leer bleiben.",
+          "Zur Auswahl stehen die Mitglieder der Bearbeiter-Gruppen.",
+          "Wer im gewählten Zeitraum selbst abwesend ist, erscheint gar nicht erst in der Liste."
+        ]
+      },
+      {
+        title: "Wer darf was",
+        items: [
+          "Sehen: die komplette Übersicht, schreibgeschützt. Der Knopf „+ Neue Abwesenheit“ fehlt, und auch ein Umweg am Bildschirm vorbei wird vom Server abgewiesen.",
+          "Bearbeiten: eigene Abwesenheiten anlegen, ändern und löschen.",
+          "Administrieren: zusätzlich die Abwesenheitsarten im Reiter „Einstellungen“ pflegen.",
+          "Der Reiter „Info“ ist für alle sichtbar."
+        ]
+      },
+      {
+        title: "Bedienung am Handy",
+        items: [
+          "Die Ansicht ist für das Handy gebaut und funktioniert dort vollständig.",
+          "Eingabefelder sind mindestens 16 Pixel groß, damit der iPhone-Browser beim Antippen nicht ungefragt in die Seite hineinzoomt und verschoben stehen bleibt."
+        ]
+      },
+      {
+        title: "Daten & Speicherung",
+        items: [
+          "Gespeichert wird in der Vereins-Nextcloud über die zentrale Anmeldung der Tools-Übersicht — ein eigenes Passwort braucht es nicht.",
+          "Ändern zwei Geräte gleichzeitig denselben Stand, erkennt die App das, lädt den fremden Stand nach und sagt Bescheid."
         ]
       }
     ]
