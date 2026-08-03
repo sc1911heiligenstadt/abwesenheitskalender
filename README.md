@@ -1,7 +1,7 @@
 # Abwesenheitskalender (v1.0)
 
 Übersicht, wer wann abwesend ist (Urlaub, Krankheit, Fortbildung/Lehrgang, Sonstiges) —
-Teil der [Tools-Übersicht](https://tecko1985.github.io/ToolsUebersicht/) des 1. SC 1911
+Teil der [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) des 1. SC 1911
 Heiligenstadt. Dient als Grundlage für die intern geregelte Vertreterregelung, die selbst
 nicht Teil dieser App ist.
 
