@@ -295,7 +295,7 @@ function renderTermine() {
 }
 
 function renderVersionInfo() {
-  document.querySelectorAll("#version-badge, #version-badge-2").forEach((el) => { if (el) el.textContent = "v" + APP_VERSION; });
+  document.querySelectorAll("#version-badge-2").forEach((el) => { if (el) el.textContent = "v" + APP_VERSION; });
   const list = document.getElementById("changelog-list");
   if (!list) return;
   list.innerHTML = APP_CHANGELOG.map((entry) => `
@@ -691,12 +691,6 @@ async function init() {
 
 function setupListeners() {
   document.querySelectorAll("nav button[data-tab]").forEach((b) => b.addEventListener("click", () => switchTab(b.dataset.tab)));
-
-  const versionBadgeHeader = document.getElementById("version-badge");
-  versionBadgeHeader.addEventListener("click", () => switchTab("info"));
-  versionBadgeHeader.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); switchTab("info"); }
-  });
 
   // "+ Neue Abwesenheit" ist für ALLE eingeloggten Nutzer sichtbar (Selbstbedienung),
   // nicht editor-only wie beim Vereinskalender.
