@@ -1,40 +1,23 @@
-# Abwesenheitskalender (v1.0)
+# 🧳 Abwesenheitskalender
 
-Übersicht, wer wann abwesend ist (Urlaub, Krankheit, Fortbildung/Lehrgang, Sonstiges) —
-Teil der [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) des 1. SC 1911
-Heiligenstadt. Dient als Grundlage für die intern geregelte Vertreterregelung, die selbst
-nicht Teil dieser App ist.
+Übersicht, wer wann abwesend ist (Urlaub, Krankheit, Fortbildung u.a.) — jede:r Berechtigte trägt eigene Abwesenheiten ein, alle mit Tool-Zugriff sehen die komplette Übersicht.
 
-**Jede:r Berechtigte trägt eigene Abwesenheiten ein** (Zeitraum von–bis, z. B. eine Woche
-Urlaub, oder ein einzelner wichtiger Tag). **Alle mit Zugriff auf dieses Tool sehen die
-komplette Übersicht** — nicht nur die eigenen Einträge, denn genau darum geht es: sichtbar
-machen, wer wann nicht da ist. Verwalten darf aber jede:r nur die eigenen Einträge;
-Mitglieder von Gruppen mit Bearbeiten-Recht für den Abwesenheitskalender (vergeben in der
-Tools-Übersicht-Gruppenverwaltung) können zusätzlich alle Einträge verwalten.
+**➡️ [Abwesenheitskalender öffnen](https://sc1911heiligenstadt.github.io/abwesenheitskalender/)**
 
-## Bedienung
+## Zugang
 
-- **Abwesenheiten** — anstehende (und laufende) Abwesenheiten chronologisch, nach Monat
-  gruppiert. Auf eine eigene Karte tippen öffnet sie zum Bearbeiten/Löschen; eine fremde
-  Karte öffnet read-only (Person, Zeitraum, Art, Notiz ansehen, aber nicht ändern).
-- **+ Neue Abwesenheit** (alle eingeloggten Nutzer) — Von/Bis-Datum, Art und optionale
-  Notiz eintragen. Ein einzelner Tag ist ein Zeitraum, bei dem Von und Bis gleich sind.
-- **Einstellungen** (nur Bearbeiter-Gruppen) — Abwesenheitsarten (Name + Farbe) anlegen,
-  umbenennen, umfärben und löschen.
-- Vergangene Abwesenheiten werden automatisch aufgeräumt, sobald ein Mitglied einer
-  Bearbeiter-Gruppe die App öffnet.
+Die Anmeldung läuft über die [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) — dort einmal anmelden, danach ist dieses Werkzeug offen.
 
-Die 4 nächsten anstehenden Abwesenheiten erscheinen zusätzlich im Dashboard-Widget der
-Tools-Übersicht.
+Die Rechte gelten in drei Stufen: **Sehen** (nur ansehen), **Bearbeiten** (Einträge pflegen) und **Administrieren** (Einstellungen und Verwaltung). Wer welche Stufe hat, legt die Tools-Übersicht fest.
+
+## Lokal starten
+
+Über den Eintrag `abwesenheitskalender` in `E:\.claude\launch.json` — der Server läuft dann auf `http://localhost:8787/`.
 
 ## Technik
 
-Vanilla-JS-App (kein Build-Step), Anmeldung & Speicherung laufen über das zentrale
-ToolsUebersicht-Login-Gateway (`admin-worker.js`), das die Daten serverseitig in der
-Vereins-Nextcloud ablegt (`abwesenheitskalender.json`). Kein separates Passwort im Client.
+Vanilla JavaScript ohne Build-Schritt — die Dateien werden so ausgeliefert, wie sie im Repo liegen. Veröffentlicht über GitHub Pages. Die Daten liegen in der Vereins-Nextcloud; der Zugriff läuft ausschließlich über den Login-Worker der Tools-Übersicht, nie mit Zugangsdaten im Browser.
 
-Anders als bei den meisten anderen Gateway-Apps ist der Lesezugriff hier bewusst
-**nicht** auf eigene Einträge beschränkt (siehe oben) — nur das Schreiben ist für
-Nicht-Bearbeiter auf eigene Einträge begrenzt, serverseitig durchgesetzt.
+---
 
-- `index.html`, `app.js`, `db.js`, `config.js`, `style.css` — die App
+Ein Werkzeug des 1. SC 1911 Heiligenstadt. Alle Werkzeuge auf einen Blick: [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) · Erklärungen im [Toolbox Wiki](https://sc1911heiligenstadt.github.io/Vereinswiki/).
