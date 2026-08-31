@@ -1,14 +1,38 @@
 # 🧳 Abwesenheitskalender
 
-Übersicht, wer wann abwesend ist (Urlaub, Krankheit, Fortbildung u.a.) — jede:r Berechtigte trägt eigene Abwesenheiten ein, alle mit Tool-Zugriff sehen die komplette Übersicht.
+Wer ist wann nicht da. Jede Person trägt ihre eigenen Abwesenheiten ein — als
+Zeitraum von–bis — und alle mit Zugriff sehen die gemeinsame Übersicht. Damit
+erübrigt sich die Rundfrage, ob am Wochenende jemand einspringen kann.
 
 **➡️ [Abwesenheitskalender öffnen](https://sc1911heiligenstadt.github.io/abwesenheitskalender/)**
+
+## Was drin ist
+
+| Reiter | Wofür |
+|---|---|
+| **Abwesenheiten** | Eigene Einträge anlegen und die Übersicht aller ansehen |
+| **Einstellungen** | Die Abwesenheitsarten pflegen |
+
+Als Arten sind **Urlaub**, **Krankheit**, **Fortbildung**, **Lehrgang** und
+**Sonstiges** hinterlegt.
+
+## Wer darf was ändern
+
+Jede Person verwaltet **nur die eigenen Einträge**. Bearbeiter-Gruppen können
+darüber hinaus alle Einträge verwalten — gedacht für die Geschäftsstelle, die
+eine Meldung telefonisch entgegennimmt.
+
+Vergangene Einträge werden automatisch aufgeräumt, die Liste bleibt also von
+selbst kurz.
 
 ## Zugang
 
 Die Anmeldung läuft über die [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) — dort einmal anmelden, danach ist dieses Werkzeug offen.
 
-Die Rechte gelten in drei Stufen: **Sehen** (nur ansehen), **Bearbeiten** (Einträge pflegen) und **Administrieren** (Einstellungen und Verwaltung). Wer welche Stufe hat, legt die Tools-Übersicht fest.
+Die Rechte gelten in drei Stufen: **Sehen** (die Übersicht ansehen),
+**Bearbeiten** (eigene Einträge pflegen, in Bearbeiter-Gruppen auch fremde) und
+**Administrieren** (Reiter *Einstellungen*: die Abwesenheitsarten). Wer welche
+Stufe hat, legt die Tools-Übersicht fest.
 
 ## Lokal starten
 
