@@ -122,15 +122,28 @@ function canManageEintrag() {
 // Lädt einmalig die Mitglieder der Bearbeiter-Gruppen dieser App (für den
 // "Vertreter"-Picker) -- Fehler werden geschluckt (leere Liste), damit ein
 // nicht ladbares Verzeichnis nicht das ganze Formular blockiert.
+// Merkt sich den LAUFENDEN Ladevorgang, nicht nur das Ergebnis: init() stoesst
+// die Vertreter-Liste parallel zu gatewayLoad() an, startApp() wartet danach nur
+// noch auf dieselbe Promise statt einen zweiten Aufruf loszuschicken. Vorher
+// lief list-tool-editors erst NACH dav-load an -- ein voller Roundtrip
+// (~180 ms), den jeder Nutzer vor dem ersten Bild abwartete, obwohl keiner der
+// beiden Aufrufe den anderen braucht. Gleiches Muster wie ladePdfLib in raumnutzung.
+let editorsLadevorgang = null;
 async function ensureEditorsLoaded() {
   if (editorUsers) return;
-  try {
-    const res = await fetchToolEditors();
-    editorUsers = Array.isArray(res.users) ? res.users : [];
-  } catch (e) {
-    console.warn("Vertreter-Liste konnte nicht geladen werden", e);
-    editorUsers = [];
-  }
+  if (editorsLadevorgang) return editorsLadevorgang;
+  editorsLadevorgang = (async () => {
+    try {
+      const res = await fetchToolEditors();
+      editorUsers = Array.isArray(res.users) ? res.users : [];
+    } catch (e) {
+      console.warn("Vertreter-Liste konnte nicht geladen werden", e);
+      editorUsers = [];
+    } finally {
+      editorsLadevorgang = null;
+    }
+  })();
+  return editorsLadevorgang;
 }
 
 // Eigentümer des Formulars: bei einer bestehenden Abwesenheit deren erstelltVon
@@ -727,6 +740,10 @@ async function startApp() {
 async function init() {
   setupListeners();
   if (!getSessionToken()) { showConnectScreen(); return; }
+  // Die Vertreter-Liste laeuft ab hier parallel zu dav-load; startApp() findet
+  // sie fertig vor oder wartet auf dieselbe Promise (siehe ensureEditorsLoaded).
+  // Bewusst NACH dem Token-Check: ohne Token soll kein Aufruf rausgehen.
+  ensureEditorsLoaded();
   try {
     const data = await gatewayLoad();
     appData = normalizeData(data);
