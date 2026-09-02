@@ -10,17 +10,26 @@ erübrigt sich die Rundfrage, ob am Wochenende jemand einspringen kann.
 
 | Reiter | Wofür |
 |---|---|
-| **Abwesenheiten** | Eigene Einträge anlegen und die Übersicht aller ansehen |
-| **Einstellungen** | Die Abwesenheitsarten pflegen |
+| **Abwesenheiten** | Einträge anlegen und die Übersicht aller ansehen; die nächste anstehende Abwesenheit steht oben hervorgehoben |
+| **Einstellungen** | Die Abwesenheitsarten mit ihren Farben pflegen |
+| **Info** | Was die App tut, die Änderungen und der Datenschutz-Hinweis |
 
-Als Arten sind **Urlaub**, **Krankheit**, **Fortbildung**, **Lehrgang** und
-**Sonstiges** hinterlegt.
+Als Arten sind **Urlaub**, **Krankheit**, **Fortbildung/Lehrgang** und
+**Sonstiges** hinterlegt — anpassbar unter *Einstellungen*.
+
+## Vertreter
+
+Zu jeder Abwesenheit lässt sich freiwillig ein **Vertreter** angeben. Zur
+Auswahl stehen die Mitglieder der Bearbeiter-Gruppen — wer im gewählten Zeitraum
+selbst abwesend ist, erscheint dort gar nicht erst.
 
 ## Wer darf was ändern
 
-Jede Person verwaltet **nur die eigenen Einträge**. Bearbeiter-Gruppen können
-darüber hinaus alle Einträge verwalten — gedacht für die Geschäftsstelle, die
-eine Meldung telefonisch entgegennimmt.
+**Sehen** heißt hier wirklich nur sehen: die Übersicht ist vollständig, aber
+nichts daran lässt sich ändern — auch nicht die eigenen Einträge. Wer
+**Bearbeiten** hat, verwaltet alle Einträge, die eigenen wie die von anderen;
+gedacht für die Geschäftsstelle, die eine Meldung telefonisch entgegennimmt. Ein
+Eintrag, den man nicht ändern darf, lässt sich trotzdem öffnen und lesen.
 
 Vergangene Einträge werden automatisch aufgeräumt, die Liste bleibt also von
 selbst kurz.
@@ -29,10 +38,11 @@ selbst kurz.
 
 Die Anmeldung läuft über die [Tools-Übersicht](https://sc1911heiligenstadt.github.io/ToolsUebersicht/) — dort einmal anmelden, danach ist dieses Werkzeug offen.
 
-Die Rechte gelten in drei Stufen: **Sehen** (die Übersicht ansehen),
-**Bearbeiten** (eigene Einträge pflegen, in Bearbeiter-Gruppen auch fremde) und
-**Administrieren** (Reiter *Einstellungen*: die Abwesenheitsarten). Wer welche
-Stufe hat, legt die Tools-Übersicht fest.
+Die Rechte gelten in drei Stufen: **Sehen** (die Übersicht ansehen,
+schreibgeschützt), **Bearbeiten** (Abwesenheiten anlegen, ändern und löschen —
+eigene wie fremde) und **Administrieren** (Reiter *Einstellungen*: die
+Abwesenheitsarten). Wer welche Stufe hat, legt die Tools-Übersicht fest. Der
+Reiter *Info* ist für alle sichtbar.
 
 ## Lokal starten
 

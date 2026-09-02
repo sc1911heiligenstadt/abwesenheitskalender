@@ -12,49 +12,14 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
-    version: "1.3",
-    groups: [
-      {
-        title: "Beim Sitzungsende wird auch alles neben der Seite geräumt",
-        items: [
-          "Beim Sitzungsende wurde die Seite bereits geleert. Der Termin-Dialog steht aber daneben und blieb mit Namen und Eingaben stehen. Jetzt wird er mitgeleert.",
-          "Der Hinweis erscheint außerdem an jeder Stelle, an der die Anmeldung wegfällt — vorher nur bei einem Teil der Wege."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.2",
-    groups: [
-      {
-        title: "Beim Abmelden bleibt nichts stehen",
-        items: [
-          "Läuft die Anmeldung ab, während die App offen ist — zum Beispiel weil ein Speichern nach längerer Pause fehlschlägt —, erscheint wie bisher der Hinweis „bitte neu anmelden“.",
-          "Neu ist: der Bildschirm dahinter wird jetzt auch geleert. Vorher wurde er nur unsichtbar gemacht, und alles Angezeigte blieb im Browser stehen — sichtbar für jeden, der sich an denselben Rechner setzt und nachschaut.",
-          "Für dich ändert sich nichts: der Weg zurück war schon immer ein Neuladen der Seite."
-        ]
-      }
-    ]
-  },
-  {
-    version: "1.1",
-    groups: [
-      {
-        title: "Am Handy",
-        items: [
-          "Bisher brach die Reiterleiste selbst um, die rechte Reiter-Gruppe darin aber nicht: Sie rutschte als ein Stück in die zweite Zeile und lief dort weiter über den rechten Rand hinaus. Jetzt bricht auch sie um, sobald sie zu breit wird. Zu sehen ist das nur, wenn genug Reiter nebeneinanderstehen — bis dahin sieht alles aus wie bisher."
-        ]
-      }
-    ]
-  },
-  {
     version: "1.0",
     groups: [
       {
         title: "Abwesenheitskalender",
         items: [
-          "Eigene Abwesenheiten mit Zeitraum von–bis eintragen: Urlaub, Krankheit, Fortbildung/Lehrgang oder Sonstiges.",
-          "Alle mit Zugriff auf das Werkzeug sehen die vollständige Übersicht, wer wann abwesend ist.",
+          "Abwesenheiten mit Zeitraum von–bis eintragen: Urlaub, Krankheit, Fortbildung/Lehrgang oder Sonstiges. Dazu ein freies Notizfeld.",
+          "Alle mit Zugriff auf das Werkzeug sehen die vollständige Übersicht, wer wann abwesend ist. Die nächste anstehende Abwesenheit steht ganz oben hervorgehoben.",
+          "Ein Eintrag, den man nicht ändern darf, lässt sich trotzdem öffnen und in Ruhe lesen — nur eben nicht bearbeiten.",
           "Vergangene Einträge räumt die App beim Öffnen von selbst auf, sobald ein Bearbeiter die Seite aufruft."
         ]
       },
@@ -70,8 +35,8 @@ const APP_CHANGELOG = [
         title: "Wer darf was",
         items: [
           "Sehen: die komplette Übersicht, schreibgeschützt. Der Knopf „+ Neue Abwesenheit“ fehlt, und auch ein Umweg am Bildschirm vorbei wird vom Server abgewiesen.",
-          "Bearbeiten: eigene Abwesenheiten anlegen, ändern und löschen.",
-          "Administrieren: zusätzlich die Abwesenheitsarten im Reiter „Einstellungen“ pflegen.",
+          "Bearbeiten: Abwesenheiten anlegen, ändern und löschen — die eigenen und die von anderen. Gedacht für die Geschäftsstelle, die eine Meldung auch einmal telefonisch entgegennimmt.",
+          "Administrieren: zusätzlich die Abwesenheitsarten mit ihren Farben im Reiter „Einstellungen“ pflegen.",
           "Der Reiter „Info“ ist für alle sichtbar."
         ]
       },
@@ -79,6 +44,7 @@ const APP_CHANGELOG = [
         title: "Bedienung am Handy",
         items: [
           "Die Ansicht ist für das Handy gebaut und funktioniert dort vollständig.",
+          "Die Reiterleiste bricht am Handy um, statt seitlich aus dem Bild zu laufen.",
           "Eingabefelder sind mindestens 16 Pixel groß, damit der iPhone-Browser beim Antippen nicht ungefragt in die Seite hineinzoomt und verschoben stehen bleibt."
         ]
       },
@@ -86,6 +52,8 @@ const APP_CHANGELOG = [
         title: "Daten & Speicherung",
         items: [
           "Gespeichert wird in der Vereins-Nextcloud über die zentrale Anmeldung der Tools-Übersicht — ein eigenes Passwort braucht es nicht.",
+          "Wird die Seite geschlossen, bevor das Speichern bestätigt ist, geht der Stand trotzdem noch raus — und es kommt eine Rückfrage, falls das einmal nicht mehr möglich ist.",
+          "Fällt die Anmeldung weg, während die App offen ist, wird der Bildschirm geräumt — die Seite selbst und auch der Termin-Dialog daneben. Es bleibt kein Name und keine Eingabe im Browser zurück, und jeder Weg führt auf den Hinweis, sich neu anzumelden.",
           "Ändern zwei Geräte gleichzeitig denselben Stand, erkennt die App das, lädt den fremden Stand nach und sagt Bescheid."
         ]
       }
