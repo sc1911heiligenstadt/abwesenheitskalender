@@ -12,6 +12,20 @@ const DEFAULT_ABWESENHEITSARTEN = [
 
 const APP_CHANGELOG = [
   {
+    version: "1.2",
+    groups: [
+      {
+        title: "Vertretung wird jetzt in beide Richtungen geprüft",
+        items: [
+          "Bisher galt die Regel nur beim Auswählen: Wer im Zeitraum schon abwesend war, tauchte in der Vertreter-Liste gar nicht erst auf.",
+          "Die Gegenrichtung fehlte. Wer zuerst als Vertretung eingetragen wurde und danach seinen eigenen Urlaub für dieselben Tage anlegte, kam durch. Nichts prüfte das, und die Karte zeigte weiter „Vertretung: …“, obwohl in diesen Tagen niemand da war. Dasselbe Ergebnis, zwei verschiedene Ausgänge — nur je nachdem, wer zuerst getippt hat.",
+          "Jetzt sagt das Speichern Bescheid: „Du bist in diesem Zeitraum als Vertretung eingetragen — für …“. Du kannst trotzdem speichern.",
+          "Und die Karte des anderen Eintrags kennzeichnet die Vertretung dann rot als offen, statt sie unverändert weiterzuzeigen."
+        ]
+      }
+    ]
+  },
+  {
     version: "1.1",
     groups: [
       {

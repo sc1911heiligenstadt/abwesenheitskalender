@@ -168,6 +168,28 @@ function personHasOverlap(username, von, bis, excludeId) {
   );
 }
 
+// Gegenrichtung zu personHasOverlap (Bugfix 2026-09-05): alle Abwesenheiten, in
+// denen DIESE Person als Vertretung eingetragen ist und die sich mit [von,bis]
+// überschneiden. personHasOverlap allein reichte nicht: es sieht nur Einträge,
+// deren erstelltVon die Person ist. Wer zuerst als Vertretung gewählt wurde und
+// DANACH seinen eigenen Urlaub eintrug, kam durch -- dieselbe Endlage, zwei
+// verschiedene Ergebnisse, je nach Reihenfolge der Eingabe.
+function vertretungenImZeitraum(username, von, bis, excludeId) {
+  if (!username || !ISO_RE.test(von) || !ISO_RE.test(bis)) return [];
+  return appData.abwesenheiten.filter((a) =>
+    a.id !== excludeId && a.vertreterUsername === username &&
+    ISO_RE.test(a.von) && ISO_RE.test(a.bis) && a.von <= bis && von <= a.bis
+  );
+}
+
+// Ist die eingetragene Vertretung dieses Eintrags im selben Zeitraum selbst
+// abwesend? Wird nur zur Anzeige gerechnet und nie gespeichert -- eine fremde
+// Zuordnung stillschweigend zu löschen wäre schlechter, als sie sichtbar als
+// offen zu kennzeichnen (siehe abwesenheitCardHtml).
+function vertretungKollidiert(a) {
+  return !!a.vertreterUsername && personHasOverlap(a.vertreterUsername, a.von, a.bis, a.id);
+}
+
 // Vertreter-Auswahlliste: ohne den Formular-Eigentümer (sich selbst vertreten
 // ergibt keinen Sinn) und ohne Personen, die im aktuell im Formular stehenden
 // Zeitraum selbst schon abwesend sind (personHasOverlap). Inkl. Platzhalter-
@@ -242,7 +264,14 @@ function abwesenheitCardHtml(a, isHero) {
   const dayBadge = `<span class="tc-day">${dt.getDate()}</span><span class="tc-mon">${MONATE_KURZ[dt.getMonth()]}</span>` +
     (end !== start ? `<span class="tc-range">bis ${fmtDate(end)}</span>` : "");
   const farbe = katFarbe(a.kategorie);
-  const vertretung = a.vertreterUsername ? `<div class="tc-sub">🔁 Vertretung: ${escapeHtml(a.vertreterName || a.vertreterUsername)}</div>` : "";
+  // Eine Vertretung, die im selben Zeitraum selbst abwesend ist, wird rot
+  // gekennzeichnet statt unverändert weiterzuzeigen -- vorher sah die Karte
+  // plausibel aus, obwohl niemand da war.
+  const vertreterFehlt = vertretungKollidiert(a);
+  const vertretung = a.vertreterUsername
+    ? `<div class="tc-sub${vertreterFehlt ? " tc-vertretung-offen" : ""}">🔁 Vertretung: ${escapeHtml(a.vertreterName || a.vertreterUsername)}` +
+      (vertreterFehlt ? ` — ⚠️ ist in diesem Zeitraum selbst abwesend` : "") + `</div>`
+    : "";
   const notiz = a.notiz ? `<div class="tc-notiz">${escapeHtml(a.notiz)}</div>` : "";
   const eigen = a.erstelltVon === myUsername() ? `<span class="tc-badge tc-badge-own">Eigener Eintrag</span>` : "";
   const mine = canManageEintrag(a);
@@ -419,6 +448,18 @@ async function saveTermin() {
   if (!ISO_RE.test(bis)) { alert("Bitte ein gültiges Bis-Datum wählen."); return; }
   if (bis < von) { alert("Das Bis-Datum darf nicht vor dem Von-Datum liegen."); return; }
   if (!kategorie) { alert("Bitte eine Art auswählen."); return; }
+
+  // Gegenprobe zur einzigen Fachregel dieser App (Bugfix 2026-09-05).
+  // fillVertreterSelect verhindert nur die eine Richtung: eine bereits abwesende
+  // Person lässt sich nicht als Vertretung wählen. Die andere Richtung -- ich
+  // trage meine eigene Abwesenheit ein, obwohl ich in genau diesen Tagen schon
+  // als Vertretung für jemanden eingetragen bin -- prüfte gar nichts.
+  const kollisionen = vertretungenImZeitraum(formOwnerUsername(), von, bis, editingId);
+  if (kollisionen.length) {
+    const liste = kollisionen.map((k) => `${personName(k)} (${abwesenheitDatumLabel(k)})`).join(", ");
+    const wer = editingId && formOwnerUsername() !== myUsername() ? "Diese Person ist" : "Du bist";
+    if (!confirm(`${wer} in diesem Zeitraum als Vertretung eingetragen — für ${liste}.\n\nTrotzdem speichern? Die Vertretung wird dort dann als offen gekennzeichnet.`)) return;
+  }
 
   // Anzeigename des gewählten Vertreters für die Karten-Anzeige einfangen (siehe
   // fillVertreterSelect -- die Option kann auch aus der "bereits gewählt, aber
