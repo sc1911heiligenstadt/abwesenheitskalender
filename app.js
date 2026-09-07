@@ -336,8 +336,27 @@ function renderTermine() {
   listEl.innerHTML = html;
 }
 
+// Was der Kalender kann -- die Karte "Funktionen" im Info-Reiter. Nutzt
+// dieselben CSS-Klassen wie frueher die Aenderungsliste (.changelog-group,
+// .cg-title, .cg-items), damit beide Karten gleich aussehen.
+function renderFunktionen() {
+  const container = document.getElementById("funktionen-list");
+  if (!container) return;
+  container.innerHTML = APP_FUNKTIONEN.map((g) => `
+    <div class="changelog-group">
+      <div class="cg-title">${escapeHtml(g.title)}</div>
+      <ul class="cg-items">${g.items.map((i) => `<li>${escapeHtml(i)}</li>`).join("")}</ul>
+    </div>
+  `).join("");
+}
+
+// Die Aenderungsliste und die Versionspille stehen seit 07.09.2026 NICHT mehr im
+// Info-Reiter: dort sollen nur die Funktionen der App stehen. APP_CHANGELOG
+// bleibt in config.js gepflegt und wird weiter geschrieben -- es ist die Quelle
+// fuer die Anleitung und fuer die Neuigkeiten-Meldungen. Diese Funktion steigt
+// darum still aus, wenn es das Ziel nicht gibt, statt beim Seitenstart mit einem
+// Fehler abzubrechen.
 function renderVersionInfo() {
-  document.querySelectorAll("#version-badge-2").forEach((el) => { if (el) el.textContent = "v" + APP_VERSION; });
   const list = document.getElementById("changelog-list");
   if (!list) return;
   list.innerHTML = APP_CHANGELOG.map((entry) => `
@@ -355,6 +374,7 @@ function renderAll() {
   if (bildschirmGeraeumt) return;
   renderTermine();
   renderVersionInfo();
+  renderFunktionen();
   renderKategorien();
 }
 
@@ -771,6 +791,7 @@ async function startApp() {
   renderHeaderUser();
   applyAdminVisibility();
   renderVersionInfo();
+  renderFunktionen();
   // Vorab laden, damit das Formular beim ersten Öffnen nicht auf die
   // Vertreter-Liste warten muss (ensureEditorsLoaded ist ohnehin idempotent).
   await ensureEditorsLoaded();

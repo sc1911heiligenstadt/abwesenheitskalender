@@ -284,3 +284,6 @@ nav .nav-right { margin-left: auto; display: flex; flex-wrap: wrap; gap: inherit
 @media (max-width: 820px) {
   input, select, textarea { font-size: 16px !important; }
 }
+/* Karte "Funktionen" im Info-Reiter -- gleiche Optik wie frueher die
+   Aenderungsliste, nur ohne Versionsueberschriften. */
+#funktionen-list { display: flex; flex-direction: column; gap: 18px; font-size: 13px; }
